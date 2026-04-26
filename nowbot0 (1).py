@@ -119,15 +119,27 @@ def add_log(msg, typ="info"):
 # =========================================================
 st.sidebar.markdown("## ⚡ BOT CONTROL")
 
-API_KEY    = st.sidebar.text_input("API Key",    value=st.session_state.saved_key,    type="password")
-API_SECRET = st.sidebar.text_input("API Secret", value=st.session_state.saved_secret, type="password")
+API_KEY_INPUT    = st.sidebar.text_input("API Key",    value=st.session_state.saved_key,    type="password")
+API_SECRET_INPUT = st.sidebar.text_input("API Secret", value=st.session_state.saved_secret, type="password")
 
-# Auto-save credentials whenever they change
-if API_KEY and API_SECRET:
-    if API_KEY != st.session_state.saved_key or API_SECRET != st.session_state.saved_secret:
-        save_creds(API_KEY, API_SECRET)
-        st.session_state.saved_key    = API_KEY
-        st.session_state.saved_secret = API_SECRET
+# Prioritize Streamlit Secrets over the text boxes
+try:
+    if "BINANCE_API_KEY" in st.secrets and "BINANCE_API_SECRET" in st.secrets:
+        API_KEY = st.secrets["BINANCE_API_KEY"]
+        API_SECRET = st.secrets["BINANCE_API_SECRET"]
+    else:
+        API_KEY = API_KEY_INPUT
+        API_SECRET = API_SECRET_INPUT
+except Exception:
+    API_KEY = API_KEY_INPUT
+    API_SECRET = API_SECRET_INPUT
+
+# Auto-save credentials if manually typed
+if API_KEY_INPUT and API_SECRET_INPUT:
+    if API_KEY_INPUT != st.session_state.saved_key or API_SECRET_INPUT != st.session_state.saved_secret:
+        save_creds(API_KEY_INPUT, API_SECRET_INPUT)
+        st.session_state.saved_key    = API_KEY_INPUT
+        st.session_state.saved_secret = API_SECRET_INPUT
 
 ALL_PAIRS      = ["XRPUSDT", "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"]
 selected_pairs = st.sidebar.multiselect("Trading Pairs", ALL_PAIRS, default=["SOLUSDT"])
