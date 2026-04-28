@@ -64,7 +64,7 @@ def save_stats(tp_counts, profits):
         pass
 
 def load_creds():
-    # 1. Check Streamlit Secrets first (for cloud hosting)
+    # 1. Check Streamlit Secrets first (for Streamlit Cloud)
     try:
         if "BINANCE_API_KEY" in st.secrets and "BINANCE_API_SECRET" in st.secrets:
             return {
@@ -74,7 +74,13 @@ def load_creds():
     except Exception:
         pass
 
-    # 2. Fallback to local JSON file
+    # 2. Check Environment Variables (for Koyeb / Docker / Railway)
+    env_key = os.environ.get("BINANCE_API_KEY", "")
+    env_secret = os.environ.get("BINANCE_API_SECRET", "")
+    if env_key and env_secret:
+        return {"api_key": env_key, "api_secret": env_secret}
+
+    # 3. Fallback to local JSON file
     if os.path.exists(CREDS_FILE):
         try:
             with open(CREDS_FILE, "r") as f:
