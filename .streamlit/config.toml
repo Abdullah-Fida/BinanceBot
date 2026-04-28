@@ -11,3 +11,6 @@ gatherUsageStats = false
 
 [theme]
 base = "dark"
+
+[client]
+showSidebarNavigation = true
